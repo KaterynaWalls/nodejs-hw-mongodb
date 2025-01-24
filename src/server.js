@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import pinoHttp from 'pino-http';
 import { getEnvVar } from './utils/getEnvVar.js';
-import ContactCollection from './db/models/Contact.js';
+
 import * as contactServices from './services/contacts.js';
 
 export const setupServer = () => {
