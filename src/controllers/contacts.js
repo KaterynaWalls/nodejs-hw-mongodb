@@ -1,6 +1,6 @@
 import * as contactServices from '../services/contacts.js';
-
-export const getContactsController = async (req, res) => {
+import createError from 'http-errors';
+export const getContactsController = async (req, res, next) => {
   const contacts = await contactServices.getAllContacts();
   res.json({
     status: 200,
@@ -9,19 +9,17 @@ export const getContactsController = async (req, res) => {
   });
 };
 
-export const getContactByIdController = async (req, res) => {
+export const getContactByIdController = async (req, res, next) => {
   const { id } = req.params;
   const contacts = await contactServices.getContactById(id);
+
   if (!contacts) {
-    return res.status(404).json({
-      status: 404,
-      message: `Contact with id ${id} not found`,
-    });
+    throw createError(404, `Contact with id=$id{id}not found`);
   }
 
   res.json({
     status: 200,
-    message: 'Successfully found contact with id {contactId}!',
+    message: 'Successfully found contact with id ${id}!',
     data: contacts,
   });
 };
