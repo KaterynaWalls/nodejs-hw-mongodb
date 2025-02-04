@@ -13,19 +13,25 @@ export const getContactById = async (contactId) => {
 export const createContact = payload => ContactCollection.create(payload);
 
 export const updateContact = async (contactId, payload, options = {}) => {
-   const {upsert = false} = options;
-   const result = await ContactCollection.findOneAndUpdate( {_id: contactId}, payload,  { 
-    new: true, 
-    upsert,
-    includeResultMetadata: true,
-   });
-   if(!result || !result.value) return null;
+    console.log("🔄 Спроба оновлення контакту:", contactId, payload);
 
-   const isNew = Boolean(result.lastErrorObject?.upserted);
-   return {
-     isNew,
-     contact: result.value,
-   };
-};
+    const result = await ContactCollection.findOneAndUpdate(
+      { _id: contactId },
+      payload,
+      {
+        new: true,
+        ...options,
+      },
+    );
+
+    if (!result) {
+        console.log("❌ Контакт не знайдено:", contactId);
+        return null;
+    }
+    console.log("✅ Контакт оновлено:", result);
+    return result;
+  };
+
+
 
 export const deleteContact = filter => ContactCollection.findOneAndDelete(filter);

@@ -1,5 +1,7 @@
 import * as contactServices from '../services/contacts.js';
 import createError from 'http-errors';
+import mongoose from 'mongoose';
+
 
 export const getContactsController = async (req, res, next) => {
   const contacts = await contactServices.getAllContacts();
@@ -45,19 +47,24 @@ res.status(status).json ({
   });
 };
 
-    export const patchContactController = async (req, res) => {
-    const { contactId } = req.params;
-    const result = await contactServices.updateContact(contactId, req.body);
+export const patchContactController = async (req, res) => {
   
-    if (!result) {
-     throw createError(404, 'Contact  not found');
-     
+    const { id } = req.params;
+    console.log("📌 PATCH-запит отримано. ID контакту:", id);
+    console.log("📌 Тіло запиту:", req.body);
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw createError(400, 'Invalid contact ID format');
     }
-  
-    res.json({
+    const result = await contactServices.updateContact(id, req.body);
+    
+    if (!result) {
+      throw createError(404, 'Contact not found');
+    }
+    res.status(200).json({
       status: 200,
-      message: `Successfully patched a contact!`,
-      data: result.contact,
+      message: 'Successfully patched a contact!',
+      data: result,
     });
   };
 
