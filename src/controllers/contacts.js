@@ -1,10 +1,27 @@
 import * as contactServices from '../services/contacts.js';
 import createError from 'http-errors';
 import mongoose from 'mongoose';
-
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+import { SORT_BY } from '../constants/contactTypeList.js';
+import { parseSortParams } from '../utils/parseSortParams.js';
+import {parseFilterParams} from '../utils/parseFilterParams.js';
 
 export const getContactsController = async (req, res, next) => {
-  const contacts = await contactServices.getAllContacts();
+  console.log("📌 Отримано GET-запит:", req.query);
+  const { page, perPage } = parsePaginationParams(req.query);
+  const { sortBy, sortOrder } = parseSortParams(req.query, SORT_BY);
+  const { filter} = parseFilterParams(req.query);
+  console.log("📌 Параметри запиту:", { page, perPage, sortBy, sortOrder, filter });
+
+  const contacts = await contactServices.getAllContacts({
+    page,
+    perPage,
+    sortBy,
+    sortOrder,
+    filter,
+  });
+
+  console.log("✅ Контакти отримані:", contacts);
   res.json({
     status: 200,
     message: 'Successfully found contacts!',
