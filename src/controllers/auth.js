@@ -1,4 +1,4 @@
-import { refreshTokenLifeTime, accessTokenLifeTime } from '../constants/contactTypeList.js';
+import { refreshTokenLifeTime } from '../constants/contactTypeList.js';
 import * as authServices from '../services/auth.js';
 
 export const registerController = async(req, res, next) =>{

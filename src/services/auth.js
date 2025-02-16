@@ -42,3 +42,7 @@ import { accessTokenLifeTime, refreshTokenLifeTime } from "../constants/contactT
         });
        
       };
+
+      export const getUser = filter => UserCollection.findOne(filter);
+    export const getSession = filter => SessionCollection.findOne(filter);
+
