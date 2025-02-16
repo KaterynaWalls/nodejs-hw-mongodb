@@ -15,7 +15,7 @@ console.log(" Authorization Header:", authHeader);
 
 const [bearer, accessToken] = authHeader.split(' ');
 
-  if (bearer !== 'Bearer' || !accessToken) {
+  if (bearer !== 'Bearer') {
    return next(createHttpError(401, 'Auth header should be of type Bearer'));
 
   }
