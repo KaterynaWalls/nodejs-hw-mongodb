@@ -1,6 +1,6 @@
 // src/db/models/user.js
 import { model, Schema } from 'mongoose';
-import { emailRegexp } from '../../constants/users.js';
+import { emailRegexp } from '../../constants/contactTypeList.js';
 
 const userSchema = new Schema(
   {
