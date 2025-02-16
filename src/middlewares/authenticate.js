@@ -6,13 +6,16 @@ import { getSession, getUser } from "../services/auth.js";
 export const authenticate = async (req, res, next) => {
 
 const authHeader = req.get('Authorization');
+console.log(" Authorization Header:", authHeader);
+
   if (!authHeader) {
    return next(createHttpError(401, 'Please provide Authorization header'));
  
   }
 
 const [bearer, accessToken] = authHeader.split(' ');
-  if (bearer !== 'Bearer') {
+
+  if (bearer !== 'Bearer' || !accessToken) {
    return next(createHttpError(401, 'Auth header should be of type Bearer'));
 
   }
@@ -33,6 +36,7 @@ const user = await getUser({_id: session.userId});
   }
 
   req.user = user;
+
   next();
 };
 

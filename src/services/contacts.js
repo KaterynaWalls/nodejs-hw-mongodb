@@ -17,6 +17,10 @@ export const getAllContacts = async ({
     contactQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
+  if(filter.userId) {
+    contactQuery.where('userId').equals(filter.userId);
+  }
+
   const [totalItems, data] = await Promise.all([
     ContactCollection.find().merge(contactQuery).countDocuments(),
     contactQuery
@@ -46,14 +50,15 @@ export const getContactById = async (contactId) => {
     return contact;
 };
 
+export const getContact = filter => ContactCollection.findOne(filter);
+
 export const createContact = payload => ContactCollection.create(payload);
 
-export const updateContact = async (contactId, payload, options = {}) => {
-    console.log("🔄 Спроба оновлення контакту:", contactId, payload);
+export const updateContact = async (filter, payload, options = {}) => {
+
 
     const result = await ContactCollection.findOneAndUpdate(
-      { _id: contactId },
-      payload,
+filter, payload,
       {
         new: true,
         ...options,
@@ -61,10 +66,10 @@ export const updateContact = async (contactId, payload, options = {}) => {
     );
 
     if (!result) {
-        console.log("❌ Контакт не знайдено:", contactId);
+        
         return null;
     }
-    console.log("✅ Контакт оновлено:", result);
+
     return result;
   };
 
