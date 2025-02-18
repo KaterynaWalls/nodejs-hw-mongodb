@@ -10,7 +10,8 @@ export const getContactsController = async (req, res, next) => {
 
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query, SORT_BY);
-  const { filter} = parseFilterParams(req.query);
+  const  filter = parseFilterParams(req.query);
+  console.log("📌 filter перед додаванням userId:", filter);
 
   filter.userId = req.user._id;
   

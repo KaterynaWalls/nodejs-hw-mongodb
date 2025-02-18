@@ -32,7 +32,10 @@ export const getAllContacts = async ({
 
   const paginationData = calcPaginationData({ totalItems, page, perPage });
 
-  if (page > paginationData.totalPages || page < 1) {
+  if (
+    (paginationData.totalPages !== 0 && page > paginationData.totalPages) ||
+    page < 1
+  ) {
     throw createHttpError(400, `Invalid page number`, {
       requestedPage: page,
       totalPages: paginationData.totalPages,

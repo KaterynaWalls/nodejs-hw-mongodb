@@ -13,7 +13,7 @@ const parseIsFavourite = (favourite) => {
   export const parseFilterParams = ({ isFavourite }) => {
     const parsedIsFavourite = parseIsFavourite(isFavourite);
   
-    return {
-      isFavourite: parsedIsFavourite,
-    };
+    return parsedIsFavourite !== undefined 
+    ? { isFavourite: parsedIsFavourite } 
+    : {}; 
   };
