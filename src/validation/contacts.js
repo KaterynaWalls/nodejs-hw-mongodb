@@ -4,7 +4,7 @@ import {contactTypeList} from '../constants/contactTypeList.js';
 
 
 export const createContactSchema = Joi.object({
-  name: Joi.string().min(3).max(20).required().messages({
+  name: Joi.string().min(3).max(30).required().messages({
     'string.base': 'Name must be a string',
     'string.empty': 'Name cannot be empty',
     'string.min': 'Name must have at least 3 characters',
@@ -34,7 +34,7 @@ export const createContactSchema = Joi.object({
 });
 
 export const updateContactSchema = Joi.object({
-  name: Joi.string().min(3).max(20).messages({
+  name: Joi.string().min(3).max(30).messages({
     'string.min': 'Name must have at least 3 characters',
     'string.max': 'Name cannot exceed 20 characters',
   }),
