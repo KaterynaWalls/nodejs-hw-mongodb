@@ -93,22 +93,32 @@ export const logout = async sessionId => {
           expiresIn: '15m',
         }
       );
-    
+      
+     
+
       const resetPasswordTemplatePath = path.join(
         TEMPLATES_DIR,
         'reset-password-email.html'
       );
-    
+      try {
+        await fs.access(resetPasswordTemplatePath); // Перевіряє, чи існує файл
+      } catch (error) {
+        console.error("Template file not found:", resetPasswordTemplatePath);
+        throw createHttpError(500, 'Email template file is missing.');
+      }
       const templateSource = (
         await fs.readFile(resetPasswordTemplatePath)
       ).toString();
     
       const template = handlebars.compile(templateSource);
+
+     
+
       const html = template({
         name: user.name,
         link: `${getEnvVar('APP_DOMAIN')}/reset-password?token=${resetToken}`
       });
-    
+
       try {
         await sendEmail({
           from: getEnvVar('SMTP_FROM'),
@@ -117,8 +127,9 @@ export const logout = async sessionId => {
           html,
         });
       } catch (error) {
+        console.error("Email sending error:", error.message);
         throw createHttpError(
-          500,  `Failed to send the email, please try again later.`,
+          500,  `Failed to send the email, please try again later. Error: ${error.message}`,
         );
       }
     };
@@ -129,11 +140,15 @@ export const logout = async sessionId => {
       try {
         entries = jwt.verify(payload.token, getEnvVar('JWT_SECRET'));
       } catch (error) {
-    throw createHttpError(401,  `Token is expired or invalid.`); 
-      }    
-      if (!entries?.email || !entries?.sub) {
-        throw createHttpError(401,  'Token is expired or invalid.');
+        if (error instanceof Error)
+          throw createHttpError(401, `Token is expired or invalid.`);
+        throw error;
       }
+    // throw createHttpError(401,  `Token is expired or invalid.`); 
+    //   }    
+    //   if (!entries?.email || !entries?.sub) {
+    //     throw createHttpError(401,  'Token is expired or invalid.');
+    //   }
       const user = await UserCollection.findOne({
         email: entries.email,
         _id: entries.sub,

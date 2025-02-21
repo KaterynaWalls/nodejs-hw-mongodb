@@ -8,6 +8,7 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import authRouter from './routers/auth.js';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import { UPLOAD_DIR } from './constants/path.js';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ export const setupServer = () => {
   app.use(logger);
   app.use(cors());
   app.use(express.json());
+  app.use('/uploads', express.static(UPLOAD_DIR));
   app.use(cookieParser());
 
   app.use('/auth', authRouter);

@@ -5,8 +5,13 @@ import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { SORT_BY } from '../constants/contactTypeList.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import {parseFilterParams} from '../utils/parseFilterParams.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
+
 
 export const getContactsController = async (req, res, next) => {
+
 
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query, SORT_BY);
@@ -50,8 +55,19 @@ export const getContactByIdController = async (req, res, next) => {
 };
 
 export const createContactController = async(req, res) => {
-  const {_id: userId} = req.user;
-const contact = await contactServices.createContact({...req.body, userId});
+  console.log("🔥 Контролер `createContactController` запустився!");
+  console.log("📸 Received file:", req.file);
+  console.log("📝 Received body:", req.body);
+const {_id: userId} = req.user;
+const photo = req.file;
+
+const photoUrl = photo
+? getEnvVar('CLOUDINARY_ENABLE') === 'true'
+  ? await saveFileToCloudinary(photo)
+  : await saveFileToUploadDir(photo)
+: '';
+
+const contact = await contactServices.createContact({...req.body, userId, photo: photoUrl});
 res.status(201).json({
     status: 201,
     message: `Successfully created a contact!`,
@@ -60,10 +76,22 @@ res.status(201).json({
 };
 
 export const upsertContactController = async(req, res) => {
-    const { id: contactId } = req.params;
-    const {_id: userId} = req.user;
-    const {isNew, data} = await contactServices.upsertContact({_id: contactId}, { ...req.body, userId}, {upsert: true});
+  const { id: contactId } = req.params;
+  const {_id: userId} = req.user;
+
+  const photo = req.file;
+  
+  const photoUrl = photo
+  ? getEnvVar('CLOUDINARY_ENABLE') === 'true'
+    ? await saveFileToCloudinary(photo)
+    : await saveFileToUploadDir(photo)
+  : '';
+
+
+    const {isNew, data} = await contactServices.upsertContact({_id: contactId}, { ...req.body, userId, photo: photoUrl }, {upsert: true});
+
 const status = isNew ? 201 : 200;
+
 res.status(status).json ({
     status,
     message: `Successfully updated a contact!`,
@@ -74,11 +102,24 @@ res.status(status).json ({
 export const patchContactController = async (req, res) => {
     const { id } = req.params;
     const {_id: userId} = req.user;
+    const photo = req.file;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw createError(400, 'Invalid contact ID format');
     }
-    const result = await contactServices.updateContact({_id: id, userId}, req.body, {new: true});
+
+    const photoUrl = photo
+    ? getEnvVar('CLOUDINARY_ENABLE') === 'true'
+      ? await saveFileToCloudinary(photo)
+      : await saveFileToUploadDir(photo)
+    : '';
+
+
+  const result = await contactServices.updateContact(
+    { _id: id, userId },
+    { ...req.body, photo: photoUrl },
+    { new: true }
+  );
     
     if (!result) {
       throw createError(404, 'Contact not found');
