@@ -14,7 +14,6 @@ requestBody:
           - name
           - phoneNumber
           - contactType
-          - userId
         properties:
           name:
             description: "Contact's name"
@@ -43,9 +42,8 @@ requestBody:
             description: "Contact's photo"
             type: string
             format: binary
-
 responses:
-  '200':
+  '201':
     description: Successfully create contact!
     content:
       application/json:
@@ -58,7 +56,7 @@ responses:
           properties:
             status:
               type: integer
-              example: 200
+              example: 201
             message:
               type: string
               example: Successfully found contacts!
